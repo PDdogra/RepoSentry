@@ -1,6 +1,7 @@
 import argparse
 from reposentry.scanner import scan_repo
 from reposentry.github_handler import clone_repo
+from reposentry.scorer import calculate_score, get_risk_level
 
 
 def is_github_url(path):
@@ -31,6 +32,8 @@ def main():
     print(f"📁 Scanning path: {path}\n")
 
     issues = scan_repo(path)
+    score = calculate_score(issues)
+    risk = get_risk_level(score)
 
     if not issues:
         print("✔ No issues found\n")
@@ -50,8 +53,11 @@ def main():
         for i in medium:
             print(f" - {i['message']} ({i['file']})")
 
-    print(f"\n📊 Total Issues: {len(issues)}")
-    print("✔ Scan complete\n")
+    
+    print(f"\n Total Issues: {len(issues)}")
+    print(f"📊 Score: {score}/100")
+    print(f"🛡 Risk Level: {risk}")
+    print("\n✔ Scan complete\n")
 
 
 if __name__ == "__main__":
