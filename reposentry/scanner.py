@@ -1,4 +1,5 @@
 import os
+from concurrent.futures import ThreadPoolExecutor
 from reposentry.rules import analyze_file
 
 
@@ -24,8 +25,11 @@ def scan_repo(path):
     issues = []
     files = get_python_files(path)
 
-    for file in files:
-        file_issues = analyze_file(file)
-        issues.extend(file_issues)
+    # Parallel processing
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        results = executor.map(analyze_file, files)
+
+    for result in results:
+        issues.extend(result)
 
     return issues
